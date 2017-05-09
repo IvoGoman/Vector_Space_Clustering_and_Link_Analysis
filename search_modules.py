@@ -1,10 +1,11 @@
 from sklearn.datasets import fetch_20newsgroups
-from sklearn.feature_extraction.text import TfidfVectorizer
+from tfidf import TfidfVectorizer
+from sklearn.preprocessing import normalize
 import numpy as np
 import util
 from scipy.sparse import csr_matrix, bmat
-
 from typing import List
+import tfidf
 
 StringList = List[str]
 
@@ -25,7 +26,7 @@ class Query:
 
     def __init__(self, text: str):
         self.text = text.lower()
-        self.tokens = self.text.split()
+        self.tokens = tfidf.tokenize(self.text)
 
 
 class TfIdfMatrix:
@@ -44,7 +45,7 @@ class TfIdfMatrix:
 
     def __init__(self, data_set: StringList):
         self._data_set = data_set
-        self._vectorizer = TfidfVectorizer(max_df=0.7, min_df=2, use_idf=True, sublinear_tf=True, norm='l2')
+        self._vectorizer = TfidfVectorizer()
         # filter stop words in more than 70% of documents, and filter unique words per query
         # apply L2 normalization (i.e. row*row sums up to 1)
 
@@ -115,6 +116,21 @@ class TfIdfMatrix:
 
     def get_number_of_terms(self):
         return self._tfidf_matrix_data_set.shape[1]
+
+    def get_doc_similarity_with_query(self, query: Query, relevant_doc_id: np.ndarray) -> np.ndarray:
+        """
+        Get the cosine similarities between all relevant documents and the query
+        :param query: 
+        :param relevant_doc_id: 
+        :return: 
+        """
+        _query_tfidf = self.get_vector_for_query(query)
+        _query_tfidf = normalize(_query_tfidf, norm='l2',axis=1)
+        _relevant_doc_rows = self._tfidf_matrix_data_set[relevant_doc_id,:]
+
+        return _relevant_doc_rows.dot(_query_tfidf.T)
+
+
 
 
 class InvertedIndex:
