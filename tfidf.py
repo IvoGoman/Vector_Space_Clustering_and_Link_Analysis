@@ -24,9 +24,9 @@ class TfidfVectorizer:
         self._vocabulary = None
         self._tf_idf_matrix = None
         self._df_counter = None
-        self._terms = None
-        self._term_position = None
-        self._term_set = set()
+        self._terms = []
+        self._term_position = {}
+
         self._n_docs = 0
         self._n_terms = 0
 
@@ -65,7 +65,7 @@ class TfidfVectorizer:
                 if max_freq is None:
                     max_freq = 1 + math.log10(frequency)
 
-                if token not in self._term_set:
+                if token not in self._term_position:
                     continue
 
                 sparse_i.append(doc_id)
@@ -101,7 +101,6 @@ class TfidfVectorizer:
 
         doc_id = 0
 
-        terms_list = []
         self._term_position = {}
         # store terms and their order
 
@@ -110,15 +109,11 @@ class TfidfVectorizer:
         sparse_data = []
 
         for doc in data_set:
+            if doc_id % 100 == 0:
+                print(doc_id)
+
             tokens = tokenize(doc)
             token_set = set(tokens)
-            new_tokens = token_set.difference(self._term_set)
-
-            for new_token in new_tokens:
-                self._term_position[new_token] = len(self._term_position)
-                terms_list.append(new_token)
-
-            self._term_set = self._term_set.union(new_tokens)
 
             self._df_counter.update(token_set)
             # increase document frequency by max 1 per doc and term (use set)
@@ -133,6 +128,10 @@ class TfidfVectorizer:
                 if max_freq is None:
                     max_freq = 1 + math.log10(frequency)
 
+                if not token in self._term_position:
+                    self._term_position[token] = len(self._term_position)
+                    self._terms.append(token)
+
                 sparse_i.append(doc_id)
                 sparse_j.append(self._term_position[token])
 
@@ -143,8 +142,7 @@ class TfidfVectorizer:
 
             doc_id += 1
 
-        self._n_terms = len(self._term_set)
-        self._terms = np.asarray(terms_list)
+        self._n_terms = len(self._terms)
 
         # construct the sparse TF matrix
         self._tf_idf_matrix = coo_matrix(

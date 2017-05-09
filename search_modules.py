@@ -1,11 +1,15 @@
 from sklearn.datasets import fetch_20newsgroups
 from tfidf import TfidfVectorizer
+#from sklearn.feature_extraction.text import TfidfVectorizer
+
 from sklearn.preprocessing import normalize
 import numpy as np
 import util
 from scipy.sparse import csr_matrix, bmat
 from typing import List
 import tfidf
+import os
+import _pickle as pkl
 
 StringList = List[str]
 
@@ -71,7 +75,7 @@ class TfIdfMatrix:
         :param query: user query
         :return: ndarray with shape 1 x n_terms
         """
-        return self._vectorizer.transform(query.text)
+        return self._vectorizer.transform([query.text])
 
     def _map_term_to_column_index(self, search_term: str) -> int:
         """
@@ -289,12 +293,21 @@ if __name__ == '__main__':
     q = Query("who likes atheism")
 
     x = TfIdfMatrix.from_data_set(newsgroup_data.data)
+
+    # with open('TfIdfMatrix.pkl', 'wb') as f:
+    #    pkl.dump(x, f, -1)
+
     i = InvertedIndex.from_tf_idf_matrix(x)
 
     # random clustering
     r = np.random.randint(0, 10, (x.get_number_of_documents(),))
 
     a = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, x)
-    print(i.get_relevant_doc_ids_for_query(q))
 
+    # with open('AdjacencyMatrix.pkl', 'wb') as f:
+    #    pkl.dump(a, f, -1)
+
+    rel = i.get_relevant_doc_ids_for_query(q)
+
+    print(x.get_doc_similarity_with_query(q, rel))
     # https://repl.it/HWGE/1
