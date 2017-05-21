@@ -3,20 +3,29 @@ from scipy.sparse import csr_matrix, bmat
 from scipy import sparse
 from search_modules import AdjacencyMatrix
 from pprint import pprint
+import os.path
+import _pickle as pkl
 
 class PageRank:
     """
     Calculates the PageRank scores for the documents contained in the Adjacency Matrix
-    =====
+
     adjacency_matrix = sparse matrix containing the weighted links between documents
     alpha = propapility for random teleports instead of following only links
     converge = threshold for the convergence of the PageRank algorithm
     """
-    def __init__(self, adjacency_matrix: AdjacencyMatrix, alpha: float, converge: float):
-        self._matrix = adjacency_matrix
-        # self._make_sparse_google_matrix(alpha)
-        self._make_google_matrix(alpha)
-        self._calculate_rank(converge)
+    def __init__(self, adjacency_matrix: AdjacencyMatrix=None, alpha: float=None, converge: float=None, pickle=None):
+        if pickle is None:
+            self._matrix = adjacency_matrix #._adjacency_matrix
+            self._alpha = alpha
+            self._converge = converge
+            # self._make_sparse_google_matrix(alpha)
+            self._make_google_matrix()
+            self._calculate_rank()
+        else:
+            if os.path.isfile(pickle) == False:
+                raise ValueError("The file does not exist.")
+            self._load_rank_vector(pickle)
 
     def _make_stochastic(self):
         """
@@ -31,17 +40,17 @@ class PageRank:
         S = self._matrix + a * (1/n * np.array([np.ones(n, np.float)]))
         self._matrix = S
 
-    def _make_google_matrix(self, alpha):
+    def _make_google_matrix(self):
         """
         Creates the full Google Matrix used to calculate PageRank on Matrices
         """
         self._make_stochastic()
         e = np.array([np.ones(self._matrix.shape[0])])
-        G = alpha * self._matrix + (1 - alpha) * 1 / self._matrix.shape[0] * e * np.transpose(e)
+        G = self._alpha * self._matrix + (1 - self._alpha) * 1 / self._matrix.shape[0] * e * np.transpose(e)
         self._matrix = G
         pprint(G)
 
-    def _make_sparse_google_matrix(self, alpha):
+    def _make_sparse_google_matrix(self):
         """
         Creates the full Google Matrix using the Sparse Matrix H
         """
@@ -55,11 +64,10 @@ class PageRank:
         e = np.array([np.ones(n)])
         e_t = np.transpose(e)
 
-        G = alpha * self._matrix + (alpha * a + (1 - alpha) * e) * 1 / n * e_t
+        G = self._alpha * self._matrix + (self._alpha * a + (1 - self._alpha) * e) * 1 / n * e_t
         self._matrix = G
-        pprint(G)
 
-    def _calculate_rank(self, converge=0.0001):
+    def _calculate_rank(self):
         """
         Calculate the PageRank for the G-Matrix
         convergence is the threshold until which we will iteratively compute the pagerank scores
@@ -79,7 +87,7 @@ class PageRank:
         # initialize r_0 and r_1 to track changes between each state
         r_0, r_1 = np.zeros(n_nodes), np.ones(n_nodes)/ n_nodes
         # Repeat until the convergence criteria is met
-        while np.sum(np.abs(r_1-r_0)) > converge:
+        while np.sum(np.abs(r_1-r_0)) > self._converge:
             r_0 = r_1.copy()
             r_1 = r_0 * self._matrix
             # calculate pagerank one node at a time
@@ -87,9 +95,16 @@ class PageRank:
 
     def get_pagerank(self, normalized: bool=True):
         if normalized:
-            return self._ranking/float(sum(self._ranking))
+            return self._ranking/float(np.sum(self._ranking))
         else:
             return self._ranking
+
+    def store_rank_vector(self, pickle):
+        with open(pickle, 'wb') as f:
+            pkl.dump(self._ranking, f, -1)
+
+    def _load_rank_vector(self, pickle):
+        self._ranking = pkl.load(open( pickle, "rb" ))
 
 if __name__ == '__main__':
     H = np.array([[0,0,1,0,0,0,0],
@@ -102,4 +117,7 @@ if __name__ == '__main__':
     print(H)
     h_mat = bmat(H).tocsr()
     pageRank = PageRank(h_mat, 0.85, 0.0001)
-    print(pageRank.get_pagerank(False))
+    pageRank.store_rank_vector('pagerank.pkl')
+    print(pageRank.get_pagerank(True))
+    pageRank2 = PageRank(pickle='pagerank.pkl')
+    print(pageRank2.get_pagerank(True))
