@@ -16,7 +16,7 @@ class PageRank:
     """
     def __init__(self, adjacency_matrix: AdjacencyMatrix=None, alpha: float=None, converge: float=None, pickle=None):
         if pickle is None:
-            self._matrix = adjacency_matrix #._adjacency_matrix
+            self._matrix = adjacency_matrix.get_matrix()
             self._alpha = alpha
             self._converge = converge
             # self._make_sparse_google_matrix(alpha)
