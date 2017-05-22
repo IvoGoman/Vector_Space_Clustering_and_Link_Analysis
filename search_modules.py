@@ -1,15 +1,13 @@
-from sklearn.datasets import fetch_20newsgroups
-from tfidf import TfidfVectorizer
-#from sklearn.feature_extraction.text import TfidfVectorizer
-
-from sklearn.preprocessing import normalize
-import numpy as np
-import util
-from scipy.sparse import csr_matrix, bmat
 from typing import List
-import tfidf
-import os
-import _pickle as pkl
+
+import numpy as np
+from scipy.sparse import csr_matrix, bmat
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.preprocessing import normalize
+
+import util
+from pagerank import PageRank
+from tfidf import TfidfVectorizer, tokenize
 
 StringList = List[str]
 
@@ -30,7 +28,7 @@ class Query:
 
     def __init__(self, text: str):
         self.text = text.lower()
-        self.tokens = tfidf.tokenize(self.text)
+        self.tokens = tokenize(self.text)
 
 
 class TfIdfMatrix:
@@ -129,12 +127,10 @@ class TfIdfMatrix:
         :return: 
         """
         _query_tfidf = self.get_vector_for_query(query)
-        _query_tfidf = normalize(_query_tfidf, norm='l2',axis=1)
-        _relevant_doc_rows = self._tfidf_matrix_data_set[relevant_doc_id,:]
+        _query_tfidf = normalize(_query_tfidf, norm='l2', axis=1)
+        _relevant_doc_rows = self._tfidf_matrix_data_set[relevant_doc_id, :]
 
         return _relevant_doc_rows.dot(_query_tfidf.T)
-
-
 
 
 class InvertedIndex:
@@ -204,7 +200,7 @@ class AdjacencyMatrix:
         self._adjacency_matrix = self._adjacency_matrix[self._undo_rearrange, :][:, self._undo_rearrange]
         util.log("Finished")
 
-    def _keep_only_max_value_in_array(self, a: int, b: int, c: int, d:int) -> csr_matrix:
+    def _keep_only_max_value_in_array(self, a: int, b: int, c: int, d: int) -> csr_matrix:
         """
         Returns a new sparse matrix with the same size as b-a, d-c which has zeroes except of the highest value
         :param a:
@@ -220,7 +216,7 @@ class AdjacencyMatrix:
         new = csr_matrix(([sub[i1, j1]], ([i1], [j1])), shape=(b - a, d - c))
         return new
 
-    def _keep_all_values_but_diag(self, a: int, b: int, c: int, d:int) -> csr_matrix:
+    def _keep_all_values_but_diag(self, a: int, b: int, c: int, d: int) -> csr_matrix:
         """
         Returns a new sparse matrix with the same sizes as b-a, d-c which retains all values, but the diagonal is set to zero
         :param a:
@@ -229,7 +225,7 @@ class AdjacencyMatrix:
         :param d:
         :return:
         """
-        sub = self._sorted_doc_similarities[a:b, c:d] # .tolil()
+        sub = self._sorted_doc_similarities[a:b, c:d]  # .tolil()
         sub.setdiag(0)
         return sub
 
@@ -264,7 +260,8 @@ class AdjacencyMatrix:
                     # our current chessboard block needs to keep all values because we are looking at similarities
                     # of documents in the same cluster
                     # keep the blocks at the diagonal completely
-                    sub_full = self._keep_all_values_but_diag(current_i_min, current_i_max, current_j_min, current_j_max)
+                    sub_full = self._keep_all_values_but_diag(current_i_min, current_i_max, current_j_min,
+                                                              current_j_max)
                     blocks[i - 1][j - 1] = sub_full
                 else:
                     # the blocks not on the diagonal only keep their maximum value
@@ -294,20 +291,19 @@ if __name__ == '__main__':
 
     x = TfIdfMatrix.from_data_set(newsgroup_data.data)
 
-    # with open('TfIdfMatrix.pkl', 'wb') as f:
-    #    pkl.dump(x, f, -1)
-
     i = InvertedIndex.from_tf_idf_matrix(x)
 
-    # random clustering
     r = np.random.randint(0, 10, (x.get_number_of_documents(),))
 
     a = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, x)
 
-    # with open('AdjacencyMatrix.pkl', 'wb') as f:
-    #    pkl.dump(a, f, -1)
+    pr = PageRank(adjacency_matrix=a, alpha=0.15, converge=0.01)
 
-    rel = i.get_relevant_doc_ids_for_query(q)
+    pr.store_rank_vector('pr.pkl')
 
-    print(x.get_doc_similarity_with_query(q, rel))
+    print(pr.get_pagerank(normalized=True))
+
+    # rel = i.get_relevant_doc_ids_for_query(q)
+
+    # print(x.get_doc_similarity_with_query(q, rel))
     # https://repl.it/HWGE/1

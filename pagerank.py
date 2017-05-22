@@ -1,20 +1,20 @@
-import numpy as np
-from scipy.sparse import csr_matrix, bmat
-from scipy import sparse
-from search_modules import AdjacencyMatrix
-from pprint import pprint
-import os.path
 import _pickle as pkl
+import os.path
+
+import numpy as np
+from scipy.sparse import bmat
+
 
 class PageRank:
     """
     Calculates the PageRank scores for the documents contained in the Adjacency Matrix
-
+  
     adjacency_matrix = sparse matrix containing the weighted links between documents
     alpha = propapility for random teleports instead of following only links
     converge = threshold for the convergence of the PageRank algorithm
     """
-    def __init__(self, adjacency_matrix: AdjacencyMatrix=None, alpha: float=None, converge: float=None, pickle=None):
+
+    def __init__(self, adjacency_matrix=None, alpha: float = None, converge: float = None, pickle=None):
         if pickle is None:
             self._matrix = adjacency_matrix.get_matrix()
             self._alpha = alpha
@@ -23,7 +23,7 @@ class PageRank:
             self._make_google_matrix()
             self._calculate_rank()
         else:
-            if os.path.isfile(pickle) == False:
+            if not os.path.isfile(pickle):
                 raise ValueError("The file does not exist.")
             self._load_rank_vector(pickle)
 
@@ -37,7 +37,7 @@ class PageRank:
         row_zeros = np.transpose([np.array(self._matrix.sum(axis=1))[:, 0] == 0])
         row_filler = np.array([np.ones(n, dtype=np.float)])
         a = row_zeros * row_filler
-        S = self._matrix + a * (1/n * np.array([np.ones(n, np.float)]))
+        S = self._matrix + a * (1 / n * np.array([np.ones(n, np.float)]))
         self._matrix = S
 
     def _make_google_matrix(self):
@@ -48,7 +48,7 @@ class PageRank:
         e = np.array([np.ones(self._matrix.shape[0])])
         G = self._alpha * self._matrix + (1 - self._alpha) * 1 / self._matrix.shape[0] * e * np.transpose(e)
         self._matrix = G
-        pprint(G)
+        # pprint(G)
 
     def _make_sparse_google_matrix(self):
         """
@@ -83,19 +83,18 @@ class PageRank:
         # self._matrix.data /= r_sums[row_index]
         self._matrix.data /= np.transpose([r_sums])
 
-
         # initialize r_0 and r_1 to track changes between each state
-        r_0, r_1 = np.zeros(n_nodes), np.ones(n_nodes)/ n_nodes
+        r_0, r_1 = np.zeros(n_nodes), np.ones(n_nodes) / n_nodes
         # Repeat until the convergence criteria is met
-        while np.sum(np.abs(r_1-r_0)) > self._converge:
+        while np.sum(np.abs(r_1 - r_0)) > self._converge:
             r_0 = r_1.copy()
             r_1 = r_0 * self._matrix
             # calculate pagerank one node at a time
         self._ranking = r_1
 
-    def get_pagerank(self, normalized: bool=True):
+    def get_pagerank(self, normalized: bool = True):
         if normalized:
-            return self._ranking/float(np.sum(self._ranking))
+            return self._ranking / float(np.sum(self._ranking))
         else:
             return self._ranking
 
@@ -104,16 +103,17 @@ class PageRank:
             pkl.dump(self._ranking, f, -1)
 
     def _load_rank_vector(self, pickle):
-        self._ranking = pkl.load(open( pickle, "rb" ))
+        self._ranking = pkl.load(open(pickle, "rb"))
+
 
 if __name__ == '__main__':
-    H = np.array([[0,0,1,0,0,0,0],
-                  [0,1,1,0,0,0,0],
-                  [1,0,1,1,0,0,0],
-                  [0,0,0,1,1,0,0],
-                  [1,0,1,0,0,0,1],
-                  [0,1,0,0,0,1,1],
-                  [0,1,0,1,1,0,1]])
+    H = np.array([[0, 0, 1, 0, 0, 0, 0],
+                  [0, 1, 1, 0, 0, 0, 0],
+                  [1, 0, 1, 1, 0, 0, 0],
+                  [0, 0, 0, 1, 1, 0, 0],
+                  [1, 0, 1, 0, 0, 0, 1],
+                  [0, 1, 0, 0, 0, 1, 1],
+                  [0, 1, 0, 1, 1, 0, 1]])
     print(H)
     h_mat = bmat(H).tocsr()
     pageRank = PageRank(h_mat, 0.85, 0.0001)

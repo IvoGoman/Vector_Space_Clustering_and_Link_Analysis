@@ -1,18 +1,18 @@
-import numpy as np
-import re
-from typing import List
-from collections import Counter
-from scipy.sparse import coo_matrix, diags
 import math
+import re
+from collections import Counter
+from typing import List
+
+import numpy as np
+from scipy.sparse import coo_matrix, diags
 from sklearn.preprocessing import normalize
 
 StringList = List[str]
 
-
 regex_tokenize = re.compile(r'(?u)\b\w\w+\b')
 
-
 np.set_printoptions(precision=2)
+
 
 def tokenize(s: str) -> StringList:
     return regex_tokenize.findall(s.lower())
@@ -84,7 +84,7 @@ class TfidfVectorizer:
 
             tf_idf_matrix = tf_idf_matrix.dot(diags(self._idf_vector))
 
-            tf_idf_matrix = normalize(tf_idf_matrix,axis=1, norm='l2')
+            tf_idf_matrix = normalize(tf_idf_matrix, axis=1, norm='l2')
             return tf_idf_matrix
 
     def fit(self, data_set: StringList):
@@ -149,7 +149,7 @@ class TfidfVectorizer:
             (sparse_data, (sparse_i, sparse_j)),
             shape=(self._n_docs, self._n_terms), dtype=np.float32)
 
-        df_vec = np.asarray([self._df_counter[t] for t in self._terms],dtype=np.float32)
+        df_vec = np.asarray([self._df_counter[t] for t in self._terms], dtype=np.float32)
         df_vec = np.multiply(np.reciprocal(df_vec), self._n_docs)
         self._idf_vector = np.log10(df_vec)
         # calc the IDF vector based on log(D / DF)
@@ -165,5 +165,3 @@ class TfidfVectorizer:
 
     def _n_terms(self):
         return self._n_terms
-
-
