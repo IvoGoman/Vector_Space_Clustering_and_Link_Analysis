@@ -2,23 +2,12 @@ from typing import List
 
 import numpy as np
 from scipy.sparse import csr_matrix, bmat
-from sklearn.datasets import fetch_20newsgroups
 from sklearn.preprocessing import normalize
 
 import util
-from pagerank import PageRank
 from tfidf import TfidfVectorizer, tokenize
 
 StringList = List[str]
-
-util.log("Loading data set...")
-newsgroup_data = fetch_20newsgroups(remove=('headers', 'footers'))
-# print(data_set.target.shape)  # categories per document
-# print(data_set.filenames.shape)  # filenames per document
-
-for doc in newsgroup_data.data:
-    if len(doc) < 5:
-        newsgroup_data.data.remove(doc)
 
 
 class Query:
@@ -99,7 +88,7 @@ class TfIdfMatrix:
 
         return np.asarray(all_column_idxs)
 
-    def get_data(self):
+    def get_matrix(self):
         """
         Get the TF IDF scores of all documents
         :return:
@@ -149,7 +138,7 @@ class InvertedIndex:
         """
         column_idxs = self._tf_idf_matrix.map_terms_to_columns(query.tokens)
 
-        tfidf_m = self._tf_idf_matrix.get_data()
+        tfidf_m = self._tf_idf_matrix.get_matrix()
 
         tf_columns = tfidf_m[:, column_idxs]
         # each column now contains the TF-IDF score for one term in our query
@@ -286,24 +275,4 @@ class AdjacencyMatrix:
         return self._adjacency_matrix
 
 
-if __name__ == '__main__':
-    q = Query("who likes atheism")
 
-    x = TfIdfMatrix.from_data_set(newsgroup_data.data)
-
-    i = InvertedIndex.from_tf_idf_matrix(x)
-
-    r = np.random.randint(0, 10, (x.get_number_of_documents(),))
-
-    a = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, x)
-
-    pr = PageRank(adjacency_matrix=a, alpha=0.15, converge=0.01)
-
-    pr.store_rank_vector('pr.pkl')
-
-    print(pr.get_pagerank(normalized=True))
-
-    # rel = i.get_relevant_doc_ids_for_query(q)
-
-    # print(x.get_doc_similarity_with_query(q, rel))
-    # https://repl.it/HWGE/1

@@ -14,13 +14,13 @@ class PageRank:
     converge = threshold for the convergence of the PageRank algorithm
     """
 
-    def __init__(self, adjacency_matrix=None, alpha: float = None, converge: float = None, pickle=None):
+    def __init__(self, adjacency_matrix=np.ndarray, alpha: float = None, converge: float = None, pickle=None):
         if pickle is None:
-            self._matrix = adjacency_matrix.get_matrix()
+            self._matrix = adjacency_matrix
             self._alpha = alpha
             self._converge = converge
-            # self._make_sparse_google_matrix(alpha)
-            self._make_google_matrix()
+            self._make_sparse_google_matrix()
+            # self._make_google_matrix()
             self._calculate_rank()
         else:
             if not os.path.isfile(pickle):

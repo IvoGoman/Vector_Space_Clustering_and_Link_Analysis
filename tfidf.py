@@ -109,8 +109,8 @@ class TfidfVectorizer:
         sparse_data = []
 
         for doc in data_set:
-            if doc_id % 100 == 0:
-                print(doc_id)
+            # if doc_id % 100 == 0:
+            #    print(doc_id)
 
             tokens = tokenize(doc)
             token_set = set(tokens)
