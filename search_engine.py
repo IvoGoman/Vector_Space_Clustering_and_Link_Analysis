@@ -51,15 +51,15 @@ class SearchEngine:
 
         doc_rel = self.newsgroup_frame.iloc[docs]
 
-        rel_agg = 0.2 * pr_rel_n + cos_rel_n * 0.8
-
-        doc_rel['score'] = rel_agg.T
+        doc_rel['pr_score'] = pr_rel_n.T
+        doc_rel['cos_score'] = cos_rel_n.T
+        doc_rel['score'] = doc_rel.pr_score * 0.2 + doc_rel.cos_score * 0.8
 
         doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False)
         print(doc_rel)
 
 if __name__ == '__main__':
-    pd.options.display.max_colwidth = 200
+    pd.options.display.max_colwidth = 100
 
     se = SearchEngine()
 
