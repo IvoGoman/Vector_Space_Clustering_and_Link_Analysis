@@ -1,5 +1,6 @@
 _data/
 
+pr.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -145,3 +146,28 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+/build/
+/benchpress-build/
+.DS_Store
+gen_docs.disable
+test.disable
+regression/temp*.html
+performance/temp*.html
+.idea/workspace.xml
+*~
+*.swp
+angular.js.tmproj
+/node_modules/
+bower_components/
+angular.xcodeproj
+.idea
+*.iml
+.agignore
+.lvimrc
+libpeerconnection.log
+npm-debug.log
+/tmp/
+/scripts/bower/bower-*
+.vscode
+*.log
+*.stackdump

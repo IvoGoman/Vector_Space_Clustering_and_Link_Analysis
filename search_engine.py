@@ -55,8 +55,9 @@ class SearchEngine:
         doc_rel['cos_score'] = cos_rel_n.T
         doc_rel['score'] = doc_rel.pr_score * 0.2 + doc_rel.cos_score * 0.8
 
-        doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False)
+        doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False).head(10)
         print(doc_rel)
+        return doc_rel
 
 if __name__ == '__main__':
     pd.options.display.max_colwidth = 100
