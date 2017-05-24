@@ -8,6 +8,7 @@ import { SearchService } from './search-service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  position = 'below'
   title = 'One Engine to find the answers';
   private searchQuery: string;
   private rankings: Ranking[];
