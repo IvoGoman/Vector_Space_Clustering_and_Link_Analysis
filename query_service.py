@@ -18,9 +18,14 @@ def query():
     result = json.dumps(result, indent=4)
     response = make_response(result)
     response.headers['Content-Type'] = 'application/json'
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:4200'
     return response
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
 
 def create_response(result):
     """Create the response Json for a given ranking"""
