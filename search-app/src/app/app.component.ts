@@ -9,7 +9,7 @@ import { SearchService } from './search-service';
 })
 export class AppComponent {
   position = 'below'
-  title = 'One Engine to find the answers';
+  title = 'One Engine to find them all';
   private searchQuery: string;
   private rankings: Ranking[];
   private errorMessage: string;

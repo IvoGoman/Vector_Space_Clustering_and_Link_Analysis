@@ -1,18 +1,15 @@
 <div class="container-fluid" height=100% item-width=100%>
   <div class="row">
-    <md-toolbar color="primary">
-      <div>
-        <img src="assets/sauron.png" height="40" width="40">
-        <span class="mdl-display-2">{{title}}</span>
-      </div>
+    <md-toolbar color="primary" style="text-align:center;">
+        <img style="margin-right:10px" src="assets/sauron.png" height="30" width="30">
+        <span  class="mdl-display-2" style="font-family: 'Tangerine', serif; font-size:36px; width:100%">{{title}}</span>
     </md-toolbar>
   </div>
   <md-card>
     <md-card-subtitle>
-      <div style="width:50%; margin-left:auto; margin-right:auto;">
-
-        <md-input-container style="width:50%">
-          <input mdInput #search style="width:80%" placeholder="This is the search you are looking for!" name="searchInput" [(ngModel)]="this.searchQuery"
+      <div style="width:50%; margin-left:auto; margin-right:auto; text-align:center;">
+        <md-input-container style="width:inherit"  floatPlaceholder="never">
+          <input mdInput #search style="display:inline-block;" type="text" placeholder="This is the search you are looking for!" name="searchInput" [(ngModel)]="this.searchQuery"
             (keyup.enter)="onSearch(search.value)" />
         </md-input-container>
         <button md-mini-fab (click)="onSearch(search.value)"><md-icon>search</md-icon></button>
@@ -20,20 +17,18 @@
     </md-card-subtitle>
     <md-card-content>
       <div *ngIf="rankings">
-        <md-card style=" height:50%; width:50%; margin-left:auto; margin-right:auto;" *ngFor="let ranking of rankings; let i = index">
+        <md-card style=" height:50%; width:50%; margin-left:auto; margin-right:auto; margin-bottom:5px;"  *ngFor="let ranking of rankings; let i = index">
           <md-card-header>
           </md-card-header>
           <md-card-content>
             {{ranking.text}}
           </md-card-content>
           <md-card-footer>
-            <md-chip-list style="float: right; width: 300px; margin-bottom:5px;">
+            <md-chip-list style="float: right; margin-right:10px; margin-bottom:5px;">
               <md-chip color="accent" selected="true">{{ranking.score | number: '1.2-2'}} </md-chip>
             </md-chip-list>
           </md-card-footer>
         </md-card>
-        <!--</md-list-item>
-        </md-list>-->
       </div>
     </md-card-content>
   </md-card>
