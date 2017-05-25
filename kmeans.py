@@ -70,7 +70,6 @@ class Kmeans:
     def do_magic(self):
         self.__cluster()
         for i in range(self.i):
-            print(str(i))
             self._recalc_centroids()
             self.__cluster()
             if self.converge:
