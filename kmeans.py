@@ -6,7 +6,6 @@ class Cluster:
     def __init__(self, initial_centroid: np.ndarray):
         self.centroid = initial_centroid
         self.members = set()
-        self.converge = True
 
     def __str__ (self):
         return "Centroid: %s\nMembers: %s" % (str(self.centroid), len(self.members))
@@ -19,6 +18,7 @@ class Kmeans:
         self.k = k
         self.i = max_iterations
         self.clusters = []
+        self.converge = None
         if random_initial:
             self.__initalize_clusters_with_random_centroids()
         else:
@@ -88,7 +88,7 @@ def cosine_sim(a: np.ndarray, b: np.ndarray):
 def sample_clustering():
     random_tfidf = np.random.rand(2000, 100)
 
-    km = Kmeans(tfidf=random_tfidf, k=2, max_iterations=1000, random_initial=False)
+    km = Kmeans(tfidf=random_tfidf, k=10, max_iterations=1000, random_initial=False)
     km.do_magic()
     for cluster in km.clusters:
         print(str(cluster))
