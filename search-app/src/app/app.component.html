@@ -10,22 +10,30 @@
   <md-card>
     <md-card-subtitle>
       <div style="width:50%; margin-left:auto; margin-right:auto;">
-        <input md-input #search style="width:80%" placeholder="This is the search you are looking for!" name="searchInput" [(ngModel)]="this.searchQuery"
-          (keyup.enter)="onSearch(search.value)" />
+
+        <md-input-container style="width:50%">
+          <input mdInput #search style="width:80%" placeholder="This is the search you are looking for!" name="searchInput" [(ngModel)]="this.searchQuery"
+            (keyup.enter)="onSearch(search.value)" />
+        </md-input-container>
         <button md-mini-fab (click)="onSearch(search.value)"><md-icon>search</md-icon></button>
       </div>
     </md-card-subtitle>
     <md-card-content>
       <div *ngIf="rankings">
-        <md-list dense>
-          <md-list-item *ngFor="let ranking of rankings; let i = index">
-            <md-icon md-list-icon>http</md-icon>
-            <h2 md-line> #{{i + 1}} Relevance: {{ranking.score | number: '1.2-2'}}</h2>
-            <div md-line class="md-list-item-text"layout="column" mdTooltip={{ranking.text}} [mdTooltipPosition]="position">
-              <span>{{ranking.text}}</span>
-            </div>
-          </md-list-item>
-        </md-list>
+        <md-card style=" height:50%; width:50%; margin-left:auto; margin-right:auto;" *ngFor="let ranking of rankings; let i = index">
+          <md-card-header>
+          </md-card-header>
+          <md-card-content>
+            {{ranking.text}}
+          </md-card-content>
+          <md-card-footer>
+            <md-chip-list style="float: right; width: 300px; margin-bottom:5px;">
+              <md-chip color="accent" selected="true">{{ranking.score | number: '1.2-2'}} </md-chip>
+            </md-chip-list>
+          </md-card-footer>
+        </md-card>
+        <!--</md-list-item>
+        </md-list>-->
       </div>
     </md-card-content>
   </md-card>
