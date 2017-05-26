@@ -25,6 +25,7 @@ export class AppComponent {
     this.allRankings = [];
     this.pagedRankings = [];
     this.error = false;
+    this.pager = {}
     if (query != "") {
       let rankings = this.searchService.search(query, alpha).subscribe(rankings => { this.allRankings = rankings; this.setPage(1); },
         error => { this.errorMessage = <any>error; this.error = true; });

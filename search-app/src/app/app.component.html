@@ -9,8 +9,8 @@
     <md-card-content>
       <div style="width:50%; margin-left:auto; margin-right:auto; margin-top:10px; text-align:center;">
         <md-input-container style="width:inherit" floatPlaceholder="never">
-          <input mdInput #search style="display:inline-block;" type="text" placeholder="This is the search you are looking for!" name="searchInput"
-            [(ngModel)]="this.searchQuery" (keyup.enter)="onSearch(search.value, alpha.value)" />
+          <input mdInput #search style="display:inline-block;" type="search" placeholder="This is the search you are looking for!" name="searchInput"
+            [(ngModel)]="this.searchQuery" (search)="onSearch(search.value, alpha.value)" (keyup.enter)="onSearch(search.value, alpha.value)" />
         </md-input-container>
         <button md-mini-fab (click)="onSearch(search.value, alpha.value)"><md-icon>search</md-icon></button>
       </div>
