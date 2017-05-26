@@ -3,7 +3,7 @@ import { Component, Input, ElementRef, OnChanges} from '@angular/core';
 @Component({    
     selector: 'read-more',
     template: `
-        <div [innerHTML]="currentText">
+        <div (dblclick)=toggleView() [innerHTML]="currentText">
         </div>
             <a style="color:#337ab7" [class.hidden]="hideToggle" (click)="toggleView()"> Read {{isCollapsed? 'more':'less'}}</a>
     `,
