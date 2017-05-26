@@ -25,13 +25,12 @@ export class SearchService {
     }
 
     private extractRanking(r:any): Ranking {
-        let ranking = <Ranking>({
-            id:r.id,
-            text: r.text,
-            score: r.score,
-            pr_score: r.pagerank,
-            cos_score: r.cosine
-        });
+        let ranking = new Ranking(
+        r.id, r.text,
+            r.score,
+             r.pagerank,
+             r.cosine
+        );
         return ranking;
     }
 
