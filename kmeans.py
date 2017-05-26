@@ -1,18 +1,18 @@
-import numpy as np
 import random
 
-class Cluster:
+import numpy as np
 
+
+class Cluster:
     def __init__(self, initial_centroid: np.ndarray):
         self.centroid = initial_centroid
         self.members = set()
 
-    def __str__ (self):
+    def __str__(self):
         return "Centroid: %s\nMembers: %s" % (str(self.centroid), len(self.members))
 
 
-class Kmeans:
-
+class KMeans:
     def __init__(self, tfidf: np.ndarray, k: int, max_iterations: int, random_initial: bool):
         self._tfidf = tfidf
         self.k = k
@@ -20,7 +20,7 @@ class Kmeans:
         self.clusters = []
         self.converge = None
         if random_initial:
-            self.__initalize_clusters_with_random_centroids()
+            self.__initialize_clusters_with_random_centroids()
         else:
             self.__initialize_cluster_with_random_document()
 
@@ -29,9 +29,8 @@ class Kmeans:
         vec = np.zeros((self._tfidf.shape[0], 1), dtype=np.int32)
         for i in range(len(self.clusters)):
             for m in self.clusters[i].members:
-                vec[m, 0] = i+1
+                vec[m, 0] = i + 1
         return vec
-
 
     def _recalc_centroids(self):
         for cluster in self.clusters:
@@ -40,10 +39,10 @@ class Kmeans:
             cluster.centroid = _sum / float(len(cluster.members))
 
     def __initialize_cluster_with_random_document(self):
-        rand_idx = (random.sample(range(self._tfidf.shape[0]-1), k=self.k))
+        rand_idx = (random.sample(range(self._tfidf.shape[0] - 1), k=self.k))
         [self.clusters.append(Cluster(initial_centroid=self._tfidf[idx])) for idx in rand_idx]
 
-    def __initalize_clusters_with_random_centroids(self):
+    def __initialize_clusters_with_random_centroids(self):
         centroids = np.random.rand(self.k, self._tfidf.shape[1])
         [self.clusters.append(Cluster(initial_centroid=centroid)) for centroid in centroids]
 
@@ -62,10 +61,9 @@ class Kmeans:
                     best_cluster = cluster
             if current_cluster != best_cluster:
                 best_cluster.members.add(d)
-                if current_cluster: current_cluster.members.remove(d)
+                if current_cluster:
+                    current_cluster.members.remove(d)
                 self.converge = False
-
-
 
     def do_magic(self):
         self.__cluster()
@@ -74,6 +72,7 @@ class Kmeans:
             self.__cluster()
             if self.converge:
                 break
+
 
 def cosine_sim(a: np.ndarray, b: np.ndarray):
     """
@@ -85,10 +84,11 @@ def cosine_sim(a: np.ndarray, b: np.ndarray):
     scalar = np.sum(np.multiply(a, b))
     return scalar / (_len_a * _len_b)
 
+
 def sample_clustering():
     random_tfidf = np.random.rand(2000, 100)
 
-    km = Kmeans(tfidf=random_tfidf, k=10, max_iterations=1000, random_initial=False)
+    km = KMeans(tfidf=random_tfidf, k=10, max_iterations=1000, random_initial=False)
     km.do_magic()
     for cluster in km.clusters:
         print(str(cluster))

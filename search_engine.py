@@ -1,6 +1,6 @@
 from search_modules import Query, AdjacencyMatrix, TfIdfMatrix, InvertedIndex
 from pagerank import PageRank
-from kmeans import Kmeans
+from kmeans import KMeans
 
 import numpy as np
 import util
@@ -30,11 +30,11 @@ class SearchEngine:
         self.inverted_index = InvertedIndex.from_tf_idf_matrix(self.tfidf_matrix)
 
         util.log("Clustering...")
-        self.kmeans = Kmeans(tfidf=self.tfidf_matrix.get_matrix(),k=20,max_iterations=20,random_initial=True)
+        self.kmeans = KMeans(tfidf=self.tfidf_matrix.get_matrix(), k=20, max_iterations=20, random_initial=False)
 
         util.log("Finished.")
 
-        r = self.kmeans.vector
+        r = self.kmeans.vector.ravel()
 
         self.adjacency_matrix = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, self.tfidf_matrix)
 
