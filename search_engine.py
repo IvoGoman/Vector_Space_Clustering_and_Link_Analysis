@@ -1,5 +1,6 @@
 from search_modules import Query, AdjacencyMatrix, TfIdfMatrix, InvertedIndex
 from pagerank import PageRank
+from kmeans import Kmeans
 
 import numpy as np
 import util
@@ -28,7 +29,12 @@ class SearchEngine:
 
         self.inverted_index = InvertedIndex.from_tf_idf_matrix(self.tfidf_matrix)
 
-        r = np.random.randint(0, 10, (self.tfidf_matrix.get_number_of_documents(),))
+        util.log("Clustering...")
+        self.kmeans = Kmeans(tfidf=self.tfidf_matrix.get_matrix(),k=20,max_iterations=20,random_initial=True)
+
+        util.log("Finished.")
+
+        r = self.kmeans.vector
 
         self.adjacency_matrix = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, self.tfidf_matrix)
 
@@ -40,7 +46,7 @@ class SearchEngine:
 
         self.pr_vector = pr.get_pagerank(normalized=True)
 
-    def run_query(self, q: Query):
+    def run_query(self, q: Query, alpha_pr: float=0.2):
         docs = self.inverted_index.get_relevant_doc_ids_for_query(q)
 
         pr_rel = self.pr_vector[:,docs].reshape(1,-1)
@@ -53,7 +59,7 @@ class SearchEngine:
 
         doc_rel['pr_score'] = pr_rel_n.T
         doc_rel['cos_score'] = cos_rel_n.T
-        doc_rel['score'] = doc_rel.pr_score * 0.2 + doc_rel.cos_score * 0.8
+        doc_rel['score'] = doc_rel.pr_score * alpha_pr + doc_rel.cos_score * (1 - alpha_pr)
 
         doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False).head(10)
         print(doc_rel)

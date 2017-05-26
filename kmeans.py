@@ -26,7 +26,7 @@ class Kmeans:
 
     @property
     def vector(self):
-        vec = np.zeros((len(self._tfidf), 1))
+        vec = np.zeros((self._tfidf.shape[0], 1), dtype=np.int32)
         for i in range(len(self.clusters)):
             for m in self.clusters[i].members:
                 vec[m, 0] = i+1
