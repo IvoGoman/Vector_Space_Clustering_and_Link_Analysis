@@ -6,7 +6,11 @@ import { Component, Input, ElementRef, OnChanges} from '@angular/core';
         <div [innerHTML]="currentText">
         </div>
             <a style="color:#337ab7" [class.hidden]="hideToggle" (click)="toggleView()"> Read {{isCollapsed? 'more':'less'}}</a>
-    `
+    `,
+    styles: [`
+        a {
+     cursor: pointer;
+    }`],
 })
 
 export class ReadMoreComponent implements OnChanges {
