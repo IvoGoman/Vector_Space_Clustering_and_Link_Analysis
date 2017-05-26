@@ -5,7 +5,7 @@ import { Component, Input, ElementRef, OnChanges} from '@angular/core';
     template: `
         <div [innerHTML]="currentText">
         </div>
-            <a style="color:blue" [class.hidden]="hideToggle" (click)="toggleView()"> Read {{isCollapsed? 'more':'less'}}</a>
+            <a style="color:#337ab7" [class.hidden]="hideToggle" (click)="toggleView()"> Read {{isCollapsed? 'more':'less'}}</a>
     `
 })
 

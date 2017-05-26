@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { Ranking, Rankings } from './data-model';
+import { Ranking, Rankings } from '../data-model';
 
+// source: https://github.com/cornflourblue/angular2-pagination-example
 
 @Injectable()
 export class SearchService {

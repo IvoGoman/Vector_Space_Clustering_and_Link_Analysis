@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material';
-import { SearchService } from './search-service';
+import { SearchService } from './services/search-service';
+import {PagerService} from './services/pager-service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { ReadMoreComponent } from './read-more.component';
@@ -20,7 +21,7 @@ import { ReadMoreComponent } from './read-more.component';
     MaterialModule,
     BrowserAnimationsModule
   ],
-  providers: [SearchService],
+  providers: [SearchService, PagerService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

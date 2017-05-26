@@ -7,7 +7,7 @@
   </div>
   <md-card>
     <md-card-content>
-      <div style="width:50%; margin-left:auto; margin-right:auto; margin-top:20px; text-align:center;">
+      <div style="width:50%; margin-left:auto; margin-right:auto; margin-top:10px; text-align:center;">
         <md-input-container style="width:inherit" floatPlaceholder="never">
           <input mdInput #search style="display:inline-block;" type="text" placeholder="This is the search you are looking for!" name="searchInput"
             [(ngModel)]="this.searchQuery" (keyup.enter)="onSearch(search.value, alpha.value)" />
@@ -33,8 +33,8 @@
       </div>
     </md-card-content>
   </md-card>
-  <div *ngIf="rankings">
-    <md-card class="card" *ngFor="let ranking of rankings; let i = index">
+  <div *ngIf="pagedRankings">
+    <md-card class="card" *ngFor="let ranking of pagedRankings; let i = index">
       <md-card-header>
       </md-card-header>
       <md-card-content>
@@ -46,5 +46,24 @@
         </md-chip-list>
       </md-card-footer>
     </md-card>
+    <div style="text-align: center;">
+      <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
+                <li [ngClass]="{disabled:pager.currentPage === 1}">
+                    <a (click)="setPage(1)">First</a>
+                </li>
+                <li [ngClass]="{disabled:pager.currentPage === 1}">
+                    <a (click)="setPage(pager.currentPage - 1)">Previous</a>
+                </li>
+                <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                    <a (click)="setPage(page)">{{page}}</a>
+                </li>
+                <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                    <a (click)="setPage(pager.currentPage + 1)">Next</a>
+                </li>
+                <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                    <a (click)="setPage(pager.totalPages)">Last</a>
+                </li>
+            </ul>
+    </div>
   </div>
 </div>

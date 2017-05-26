@@ -61,7 +61,7 @@ class SearchEngine:
         doc_rel['cos_score'] = cos_rel_n.T
         doc_rel['score'] = doc_rel.pr_score * alpha_pr + doc_rel.cos_score * (1 - alpha_pr)
 
-        doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False).head(10)
+        doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False)
         print(doc_rel)
         return doc_rel
 
