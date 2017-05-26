@@ -36,6 +36,9 @@ class SearchEngine:
 
         r = self.kmeans.vector.ravel()
 
+        u = np.unique(self.kmeans.vector)
+        print(u)
+
         self.adjacency_matrix = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, self.tfidf_matrix)
 
         util.log("Calculating PR...")
