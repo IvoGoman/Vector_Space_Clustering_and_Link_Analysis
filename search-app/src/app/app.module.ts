@@ -6,10 +6,12 @@ import { MaterialModule } from '@angular/material';
 import { SearchService } from './search-service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
+import { ReadMoreComponent } from './read-more.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ReadMoreComponent
   ],
   imports: [
     BrowserModule,

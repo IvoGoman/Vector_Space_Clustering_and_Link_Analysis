@@ -16,10 +16,12 @@ export class AppComponent {
   private errorMessage: string;
   constructor(private service: SearchService) {}
 
-  onSearch(query: String) {
-    console.log(query);
-    let rankings = this.service.search(query).subscribe(rankings=>{this.rankings = rankings; this.error=false;},
-    error=> {this.errorMessage = <any> error; this.error = true; this.rankings = []});
-    console.log(rankings)
+  onSearch(query: String, alpha: number) {
+    this.rankings = [];
+    this.error = false;
+    if(query != ""){
+    let rankings = this.service.search(query, alpha).subscribe(rankings=>{this.rankings = rankings},
+    error=> {this.errorMessage = <any> error; this.error = true;});
+    }
   }
 }

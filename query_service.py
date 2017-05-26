@@ -12,7 +12,8 @@ def query():
     """ Receives Query from the Frontend"""
     req = request.get_json(silent=True, force=True)
     query_string = Query(req.get('query'))
-    result = SEARCH_ENGINE.run_query(query_string,alpha_pr=0.2)
+    alpha_pr = req.get('alpha')
+    result = SEARCH_ENGINE.run_query(query_string, alpha_pr)
     # result = jsonify(result.to_dict())
     result = create_response(result)
     result = json.dumps(result, indent=4)

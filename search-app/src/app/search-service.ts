@@ -11,10 +11,10 @@ export class SearchService {
 
     constructor(private http: Http) { }
 
-    search(query: String): Observable<Ranking[]> {
+    search(query: String, alpha: Number): Observable<Ranking[]> {
         let header = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: header });
-        let json = { "query": query }
+        let json = { "query": query, "alpha": alpha }
         return this.http.post(this.searchEndpoint, json, options).map(res=> res.json().results).catch(this.handleErrorObservable)
     }
 
