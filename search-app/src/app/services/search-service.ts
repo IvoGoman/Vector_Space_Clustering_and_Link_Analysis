@@ -16,23 +16,22 @@ export class SearchService {
         let header = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: header });
         let json = { "query": query, "alpha": alpha }
-        return this.http.post(this.searchEndpoint, json, options).map(res=> res.json().results).catch(this.handleErrorObservable)
+        return this.http.post(this.searchEndpoint, json, options).map(res => this.extractRankings(res) ) .catch(this.handleErrorObservable)
     }
 
-    private extractRankings(res: Response): Rankings {
-        console.log(res.json().results)
-        let rankings_ =  res.json().results.map(this.extractRanking);
-        console.log(rankings_);
-        return <Rankings>({rankings: rankings_})
+    private extractRankings(res: Response): Ranking[] {
+        let rankings =  res.json().results.map(r => this.extractRanking(r));
+        return rankings
     }
 
     private extractRanking(r:any): Ranking {
         let ranking = <Ranking>({
             id:r.id,
             text: r.text,
-            score: r.score
+            score: r.score,
+            pr_score: r.pagerank,
+            cos_score: r.cosine
         });
-        console.log(ranking);
         return ranking;
     }
 

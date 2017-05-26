@@ -4,6 +4,8 @@ export class Rankings {
 }
 
 export class Ranking{
+    pr_score: string;
+    cos_score: string;
     score: string;
     text: string;
     id: string;

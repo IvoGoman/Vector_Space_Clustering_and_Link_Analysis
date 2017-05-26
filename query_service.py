@@ -32,8 +32,8 @@ def create_response(result):
     """Create the response Json for a given ranking"""
     rankings = []
     for row in result.iterrows():
-        ranking = {"id": str(row[0]), "text": row[1]
-                   ['text'], "score": row[1]['score']}
+        ranking = {'id': str(row[0]), 'text': row[1]
+                   ['text'], 'score': row[1]['score'], 'pagerank':row[1]['pr_score'], 'cosine':row[1]['cos_score']}
         rankings.append(ranking)
     return {
         "results": rankings

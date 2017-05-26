@@ -42,7 +42,9 @@
       </md-card-content>
       <md-card-footer>
         <md-chip-list style="float: right; margin-right:10px; margin-bottom:5px;">
-          <md-chip mdTooltip="Relevance score" color="accent" selected="true">{{ranking.score | number: '1.2-2'}} </md-chip>
+          <md-chip mdTooltip="Relevance score" color="primary" selected="true">{{ranking.score | number: '1.2-2'}} </md-chip>
+          <md-chip mdTooltip="PageRank score" color="accent" selected="true">{{ranking.pr_score | number: '1.2-2'}} </md-chip>
+          <md-chip mdTooltip="Cosine score" color="accent" selected="true">{{ranking.cos_score | number: '1.2-2'}} </md-chip>
         </md-chip-list>
       </md-card-footer>
     </md-card>
