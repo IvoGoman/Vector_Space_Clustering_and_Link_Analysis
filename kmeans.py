@@ -1,6 +1,8 @@
 import random
-
+from scipy.sparse import csr_matrix
 import numpy as np
+import _pickle as pkl
+import util
 
 
 class Cluster:
@@ -24,13 +26,17 @@ class KMeans:
         else:
             self.__initialize_cluster_with_random_document()
 
+        self.__vector = None
+
     @property
     def vector(self):
-        vec = np.zeros((self._tfidf.shape[0], 1), dtype=np.int32)
-        for i in range(len(self.clusters)):
-            for m in self.clusters[i].members:
-                vec[m, 0] = i + 1
-        return vec
+        if not self.__vector:
+            vec = np.zeros((self._tfidf.shape[0], 1), dtype=np.int32)
+            for i in range(len(self.clusters)):
+                for m in self.clusters[i].members:
+                    vec[m, 0] = i + 1
+            return vec
+        else: return self.__vector
 
     def _recalc_centroids(self):
         for cluster in self.clusters:
@@ -68,28 +74,28 @@ class KMeans:
     def do_magic(self):
         self.__cluster()
         for i in range(self.i):
+            util.log('kmeans iteration %s starting' % str(i))
             self._recalc_centroids()
             self.__cluster()
             if self.converge:
                 break
 
+    def store_cluster_vector(self, file):
+            with open(file, 'wb') as f:
+                pkl.dump(self.vector, f)
 
-def cosine_sim(a: np.ndarray, b: np.ndarray):
+    def load_cluster_vector(self, file):
+        self.__vector = pkl.load(open(file, "rb"))
+
+
+
+def cosine_sim(a: csr_matrix, b: csr_matrix):
     """
     :param a, b: Vector of size 1:#terms
     :return: Cosine distance
     """
-    _len_a = np.sqrt(np.square(a).sum())
-    _len_b = np.sqrt(np.square(b).sum())
-    scalar = np.sum(np.multiply(a, b))
+    _len_a = np.sqrt((a.power(2)).sum())
+    _len_b = np.sqrt((b.power(2)).sum())
+    scalar = float((a.multiply(b)).sum())
     return scalar / (_len_a * _len_b)
 
-
-def sample_clustering():
-    random_tfidf = np.random.rand(2000, 100)
-
-    km = KMeans(tfidf=random_tfidf, k=10, max_iterations=1000, random_initial=False)
-    km.do_magic()
-    for cluster in km.clusters:
-        print(str(cluster))
-    return km.vector

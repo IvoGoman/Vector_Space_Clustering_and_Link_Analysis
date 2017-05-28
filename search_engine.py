@@ -32,6 +32,12 @@ class SearchEngine:
         util.log("Clustering...")
         self.kmeans = KMeans(tfidf=self.tfidf_matrix.get_matrix(), k=20, max_iterations=20, random_initial=False)
 
+        try:
+            self.kmeans.load_cluster_vector('cluster_vector.pkl')
+        except FileNotFoundError:
+            self.kmeans.do_magic()
+            self.kmeans.store_cluster_vector('cluster_vector.pkl')
+
         util.log("Finished.")
 
         r = self.kmeans.vector.ravel()
