@@ -1,5 +1,5 @@
 import random
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, bmat
 import numpy as np
 import _pickle as pkl
 import util
@@ -30,19 +30,21 @@ class KMeans:
 
     @property
     def vector(self):
-        if not self.__vector:
+        if len(self.__vector) == 0:
             vec = np.zeros((self._tfidf.shape[0], 1), dtype=np.int32)
             for i in range(len(self.clusters)):
                 for m in self.clusters[i].members:
                     vec[m, 0] = i + 1
             return vec
-        else: return self.__vector
+        else:
+            return self.__vector
 
     def _recalc_centroids(self):
         for cluster in self.clusters:
-            mem = np.array([self._tfidf[m] for m in cluster.members])
-            _sum = np.sum(mem, axis=0)
-            cluster.centroid = _sum / float(len(cluster.members))
+            if len(cluster.members) != 0:
+                mem = np.array([self._tfidf[m] for m in cluster.members])
+                _sum = np.sum(mem, axis=0)
+                cluster.centroid = _sum / float(len(cluster.members))
 
     def __initialize_cluster_with_random_document(self):
         rand_idx = (random.sample(range(self._tfidf.shape[0] - 1), k=self.k))
@@ -54,25 +56,26 @@ class KMeans:
 
     def __cluster(self):
         self.converge = True
-        for d in range(self._tfidf.shape[0]):
+        centroids = bmat([[item for item in c.centroid[0]] for c in self.clusters])
+        similarities = centroids.dot(self._tfidf.T)
+        for d in range(similarities.shape[1]):
             best_sim = 0
             best_cluster = None
             current_cluster = None
-            for cluster in self.clusters:
-                sim = cosine_sim(cluster.centroid, self._tfidf[d])
-                if d in cluster.members:
-                    current_cluster = cluster
+            for c in range(similarities.shape[0]):
+                sim = similarities[c,d]
+                if d in self.clusters[c].members:
+                    current_cluster = c
                 if sim > best_sim:
                     best_sim = sim
-                    best_cluster = cluster
+                    best_cluster = c
             if current_cluster != best_cluster:
-                best_cluster.members.add(d)
+                self.clusters[best_cluster].members.add(d)
                 if current_cluster:
-                    current_cluster.members.remove(d)
+                    self.clusters[current_cluster].members.remove(d)
                 self.converge = False
 
     def do_magic(self):
-        self.__cluster()
         for i in range(self.i):
             util.log('kmeans iteration %s starting' % str(i))
             self._recalc_centroids()

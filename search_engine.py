@@ -41,7 +41,6 @@ class SearchEngine:
         util.log("Finished.")
 
         r = self.kmeans.vector.ravel()
-
         u = np.unique(self.kmeans.vector)
         print(u)
 
