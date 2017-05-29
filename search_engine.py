@@ -8,7 +8,7 @@ from sklearn.datasets import fetch_20newsgroups
 import pandas as pd
 
 from sklearn.preprocessing import normalize
-
+import timeit
 
 class SearchEngine:
     def __init__(self):
@@ -50,8 +50,7 @@ class SearchEngine:
         except FileNotFoundError:
             util.log("No precomputed PageRank...")
             util.log("Calculating PR...")
-            pr = PageRank(adjacency_matrix=self.adjacency_matrix.get_matrix(), alpha=0.15, converge=0.01)
-
+            pr = PageRank(adjacency_matrix=self.adjacency_matrix.get_matrix(), alpha=0.85, converge=0.00001)
         util.log("Finished PR")
         pr.store_rank_vector('pr.pkl')
 

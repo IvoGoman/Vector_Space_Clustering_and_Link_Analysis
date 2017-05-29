@@ -1,8 +1,10 @@
 import _pickle as pkl
 import os.path
-
+import util
 import numpy as np
-from scipy.sparse import bmat
+from scipy.sparse import csr_matrix, bmat
+import scipy as scipy
+from sklearn.preprocessing import normalize
 
 
 class PageRank:
@@ -19,78 +21,34 @@ class PageRank:
             self._matrix = adjacency_matrix
             self._alpha = alpha
             self._converge = converge
-            self._make_sparse_google_matrix()
-            # self._make_google_matrix()
-            self._calculate_rank()
+            self._max_iter = 100
+            self._run()
         else:
             if not os.path.isfile(pickle):
                 raise FileNotFoundError("The file does not exist.")
             self._load_rank_vector(pickle)
 
-    def _make_stochastic(self):
+    def _run(self):
         """
-        Fills rows only containing zeros with equal probabilities
-        0 -> 1/N
-        """
-        n = self._matrix.shape[0]
-        #  boolean array with 1 for rows that are zero
-        row_zeros = np.transpose([np.array(self._matrix.sum(axis=1))[:, 0] == 0])
-        row_filler = np.array([np.ones(n, dtype=np.float)])
-        a = row_zeros * row_filler
-        S = self._matrix + a * (1 / n * np.array([np.ones(n, np.float)]))
-        self._matrix = S
-
-    def _make_google_matrix(self):
-        """
-        Creates the full Google Matrix used to calculate PageRank on Matrices
-        """
-        self._make_stochastic()
-        e = np.array([np.ones(self._matrix.shape[0])])
-        G = self._alpha * self._matrix + (1 - self._alpha) * 1 / self._matrix.shape[0] * e * np.transpose(e)
-        self._matrix = G
-        # pprint(G)
-
-    def _make_sparse_google_matrix(self):
-        """
-        Creates the full Google Matrix using the Sparse Matrix H
+        Calculates the PageRank Scores for the given Adjacency Matrix
         """
         n = self._matrix.shape[0]
-
-        # Creates 'a' which is a matrix with rows filled that have row sum 0 in H
-        row_zeros = np.transpose([np.array(self._matrix.sum(axis=1))[:, 0] == 0])
-        row_filler = np.array([np.ones(n, dtype=np.float)])
-        a = row_zeros * row_filler
-
-        e = np.array([np.ones(n)])
-        e_t = np.transpose(e)
-
-        G = self._alpha * self._matrix + (self._alpha * a + (1 - self._alpha) * e) * 1 / n * e_t
-        self._matrix = G
-
-    def _calculate_rank(self):
-        """
-        Calculate the PageRank for the G-Matrix
-        convergence is the threshold until which we will iteratively compute the pagerank scores
-        """
-        # number of nodes in the graph
-        n_nodes = self._matrix.shape[0]
-
-        # Array of row counts necesssary to identify sinks in the graph
-        r_sums = np.array(self._matrix.sum(1))[:, 0]
-        row_index, col_index = self._matrix.nonzero()
-
-        # Creating Row Normalized Version of our matrix
-        # self._matrix.data /= r_sums[row_index]
-        self._matrix.data /= np.transpose([r_sums])
-
+        e_t = np.array([np.ones(n)])
+        e = np.transpose(e_t)
         # initialize r_0 and r_1 to track changes between each state
-        r_0, r_1 = np.zeros(n_nodes), np.ones(n_nodes) / n_nodes
-        # Repeat until the convergence criteria is met
-        while np.sum(np.abs(r_1 - r_0)) > self._converge:
+        r_0, r_1 = np.zeros(n), np.ones(n) / n
+        # Creates 'a' which is a matrix with rows filled that have row sum 0 in H
+        a = np.transpose([np.array(self._matrix.sum(axis=1))[:, 0] == 0]).astype(np.float64)
+        # Row normalize the matrix
+        self._matrix = normalize(self._matrix, norm='l1', axis=1)
+        i = 0
+        while (np.sum(np.abs(r_1 - r_0)) > self._converge) and (i < self._max_iter):
             r_0 = r_1.copy()
-            r_1 = r_0 * self._matrix
-            # calculate pagerank one node at a time
+            r_1 = self._alpha * csr_matrix.dot(r_0, self._matrix) + (self._alpha * np.dot(r_0, a) + (1 - self._alpha) * np.dot(r_0, e)) * (e_t / n)
+            i += 1
+            util.log("PageRank Iteration: " + str(i))
         self._ranking = r_1
+
 
     def get_pagerank(self, normalized: bool = True):
         if normalized:
@@ -107,17 +65,13 @@ class PageRank:
 
 
 if __name__ == '__main__':
-    H = np.array([[0, 0, 1, 0, 0, 0, 0],
-                  [0, 1, 1, 0, 0, 0, 0],
-                  [1, 0, 1, 1, 0, 0, 0],
-                  [0, 0, 0, 1, 1, 0, 0],
-                  [1, 0, 1, 0, 0, 0, 1],
-                  [0, 1, 0, 0, 0, 1, 1],
-                  [0, 1, 0, 1, 1, 0, 1]])
+    H = np.array([[0, 0, 0, 0, 0],
+                  [1, 0, 1, 1, 0],
+                  [0, 1, 0, 0, 0],
+                  [0, 1, 1, 0, 0],
+                  [0, 0, 0, 1, 0]])
     print(H)
     h_mat = bmat(H).tocsr()
-    pageRank = PageRank(h_mat, 0.85, 0.0001)
-    pageRank.store_rank_vector('pagerank.pkl')
+    pageRank = PageRank(h_mat, 0.9, 0.0001)
     print(pageRank.get_pagerank(True))
-    pageRank2 = PageRank(pickle='pagerank.pkl')
-    print(pageRank2.get_pagerank(True))
+

@@ -1,6 +1,7 @@
 _data/
 
 pr.pkl
+pagerank.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
