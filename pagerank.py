@@ -24,7 +24,7 @@ class PageRank:
             self._calculate_rank()
         else:
             if not os.path.isfile(pickle):
-                raise ValueError("The file does not exist.")
+                raise FileNotFoundError("The file does not exist.")
             self._load_rank_vector(pickle)
 
     def _make_stochastic(self):

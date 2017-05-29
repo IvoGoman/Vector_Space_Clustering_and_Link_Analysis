@@ -45,9 +45,12 @@ class SearchEngine:
         print(u)
 
         self.adjacency_matrix = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, self.tfidf_matrix)
-
-        util.log("Calculating PR...")
-        pr = PageRank(adjacency_matrix=self.adjacency_matrix.get_matrix(), alpha=0.15, converge=0.01)
+        try:
+            pr = PageRank(pickle='pr.pkl')
+        except FileNotFoundError:
+            util.log("No precomputed PageRank...")
+            util.log("Calculating PR...")
+            pr = PageRank(adjacency_matrix=self.adjacency_matrix.get_matrix(), alpha=0.15, converge=0.01)
 
         util.log("Finished PR")
         pr.store_rank_vector('pr.pkl')
