@@ -59,39 +59,39 @@ def average_precision(relevant: set, retrieved: list):
     return _sum_precisions/len(relevant)
 
 
-def pooling(models: dict):
+def pooling(query: dict):
     """
     This builds the union from different models of a given query
     :param ranking: A dict containing the different model names as keys and as value an array of dicts that contains the key 'id' with the document id that the model considered as relevant
     :return: the union of all as relevant considered docs
     """
-    retrieved = []
-    for ranking in models.values():
-        for doc in ranking:
-            doc_id = int(doc['id'])
-            if doc_id not in retrieved:
-                retrieved.append(doc_id)
+    retrieved = set()
+    for alpha in query.values():
+        for ranking in alpha:
+            retrieved.add(ranking)
     return retrieved
 
 def obtain_ranked_array(ranking_query: dict) -> dict:
     ranked_dict_per_query = {}
-    for query in ranking_query:
-        for ranking in query:
-            ranked_dict_per_query[query] = [int(doc['id']) for doc in ranking]
+    for query, alphas in ranking_query.items():
+        ranked_dict_per_query[query] = {}
+        for alpha, ranking in alphas.items():
+            ranked_dict_per_query[query][alpha] = [int(doc['id']) for doc in ranking]
     return ranked_dict_per_query
 
 
 if __name__ == '__main__':
     ranking_query = run_queries(QUERIES, MODEL_ALPHAS, P_AT_N)
-    retrieved_docs = {}
-    for query, models in ranking_query.items():
-        retrieved_docs[query] = pooling(models)
-    print('Document ids considered relevant by query')
-    pprint(retrieved_docs)
     ranked_array_by_query = obtain_ranked_array(ranking_query)
     evaluation = {}
-    for query, ranking in ranked_array_by_query:
-        evaluation[query] = {
-            'r-precision' : compute_rprecision(RELEVANT_DOCIDS[query], ranking)
-        }
+    union_of_retrieved_docs = {}
+    for query, alphas in ranked_array_by_query.items():
+        union_of_retrieved_docs[query] = pooling(alphas)
+        evaluation[query]= {}
+        for ranking in alphas.values():
+            evaluation[query][alphas] = {
+                'r-precision' : compute_rprecision(RELEVANT_DOCIDS[query], ranking)
+            }
+    print('Document ids considered relevant by query')
+    pprint(union_of_retrieved_docs)
     pprint(evaluation)
