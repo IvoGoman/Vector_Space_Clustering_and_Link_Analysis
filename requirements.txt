@@ -3,3 +3,4 @@ numpy
 spacy
 scipy
 sklearn
+flask

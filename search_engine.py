@@ -10,6 +10,9 @@ import pandas as pd
 from sklearn.preprocessing import normalize
 import timeit
 
+from typing import List
+IntList = List[int]
+
 class SearchEngine:
     def __init__(self):
         util.log("Loading data set...")
@@ -56,7 +59,7 @@ class SearchEngine:
 
         self.pr_vector = pr.get_pagerank(normalized=True)
 
-    def run_query(self, q: Query, alpha_pr: float=0.2):
+    def run_query(self, q: Query, alpha_pr: float=0.2) -> pd.DataFrame:
         docs = self.inverted_index.get_relevant_doc_ids_for_query(q)
 
         pr_rel = self.pr_vector[:,docs].reshape(1,-1)
@@ -74,6 +77,21 @@ class SearchEngine:
         doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False)
         print(doc_rel)
         return doc_rel
+
+    def p_at_r(self, q: Query, rel_ids: IntList, alpha_pr: float=0.2):
+        res = self.run_query(q,alpha_pr)
+
+        current_pos = 0
+        for idx, row in res.iterrows():
+            current_pos += 1
+            if idx in rel_ids:
+                print("Found", idx, "at", current_pos)
+                rel_ids.remove(idx)
+            if len(rel_ids) is 0:
+                print("All found at", current_pos)
+                print("P@R:", 10.0 / current_pos)
+
+
 
 if __name__ == '__main__':
     pd.options.display.max_colwidth = 100
