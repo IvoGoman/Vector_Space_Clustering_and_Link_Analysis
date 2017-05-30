@@ -30,7 +30,7 @@ class KMeans:
 
     @property
     def vector(self):
-        if len(self.__vector) == 0:
+        if self.__vector is None:
             vec = np.zeros((self._tfidf.shape[0], 1), dtype=np.int32)
             for i in range(len(self.clusters)):
                 for m in self.clusters[i].members:
