@@ -19,6 +19,9 @@ class Query:
         self.text = text.lower()
         self.tokens = tokenize(self.text)
 
+    def __str__(self):
+        return self.text
+
 
 class TfIdfMatrix:
     """
