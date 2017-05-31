@@ -11,9 +11,9 @@ QUERIES = [
 ]
 
 RELEVANT_DOCIDS = {
-    "satellite launch": set([0]),
-    "national rifle association": set([0]),
-    "diabetes risk": set([0])
+    "satellite launch": set([]),
+    "national rifle association": set([455, 590]),
+    "diabetes risk": set([454, 3059, 3258, 7425])
 }
 
 P_AT_N = 10
@@ -44,6 +44,8 @@ def run_queries(queries: list, alphas: list, n: int) -> dict:
 
 def compute_precision(relevant: set, retrieved: set):
     tp = len(set.intersection(relevant, retrieved))
+    if len(retrieved) == 0:
+        return 0.0
     return tp/len(retrieved)
 
 def compute_p_at_k(k: int, relevant: set, retrieved: list):
