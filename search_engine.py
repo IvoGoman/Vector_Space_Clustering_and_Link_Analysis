@@ -28,6 +28,8 @@ class SearchEngine:
 
         self.newsgroup_frame = pd.DataFrame.from_dict({'text': self.newsgroup_data.data})
 
+        return
+
         self.tfidf_matrix = TfIdfMatrix.from_data_set(self.newsgroup_data.data)
 
         self.inverted_index = InvertedIndex.from_tf_idf_matrix(self.tfidf_matrix)
@@ -58,6 +60,13 @@ class SearchEngine:
         pr.store_rank_vector('pr.pkl')
 
         self.pr_vector = pr.get_pagerank(normalized=True)
+
+    def list_docs(self, ids):
+        x = self.newsgroup_frame.iloc[ids]
+        for idx, r in x.iterrows():
+            print(idx)
+            print(' '.join(r.text.split()))
+            print()
 
     def run_query(self, q: Query, alpha_pr: float=0.2) -> pd.DataFrame:
         docs = self.inverted_index.get_relevant_doc_ids_for_query(q)
@@ -98,4 +107,26 @@ if __name__ == '__main__':
 
     se = SearchEngine()
 
-    se.run_query(Query("atheism"))
+    se.list_docs([455, # R
+                                590, # R
+                                2183, # N
+                                3403, # N
+                                3738, # N
+                                4263, # N
+                                4802, # N
+                                4959, # N
+                                5988, # N
+                                6219, # N
+                                6332, # N
+                                6623, # N
+                                6920, # N
+                                7112, # N
+                                7126, # N
+                                7241, # N
+                                8285, # N
+                                8467, # N
+                                9104, # N
+                                9605, # N
+                                9625, # N
+                                9641]) # N
+

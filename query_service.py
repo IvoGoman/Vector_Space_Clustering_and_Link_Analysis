@@ -21,6 +21,7 @@ def query():
     response.headers['Content-Type'] = 'application/json'
     return response
 
+
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
