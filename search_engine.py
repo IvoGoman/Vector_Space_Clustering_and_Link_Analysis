@@ -2,6 +2,7 @@ from search_modules import Query, AdjacencyMatrix, TfIdfMatrix, InvertedIndex
 from pagerank import PageRank
 from kmeans import KMeans
 
+import _pickle as pkl
 import numpy as np
 import util
 from sklearn.datasets import fetch_20newsgroups
@@ -52,8 +53,12 @@ class SearchEngine:
         r = self.kmeans.vector.ravel()
         u = np.unique(self.kmeans.vector)
         print(u)
-
-        self.adjacency_matrix = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, self.tfidf_matrix)
+        try:
+            self.adjacency_matrix = pkl.load(open('adjacency_matrix.pkl', "rb"))
+        except FileNotFoundError:
+            self.adjacency_matrix = AdjacencyMatrix.from_cluster_and_tf_idf_matrix(r, self.tfidf_matrix)
+            with open('adjacency_matrix.pkl', 'wb') as f:
+                pkl.dump(self.adjacency_matrix, f)
         try:
             pr = PageRank(pickle='pr.pkl')
         except FileNotFoundError:
@@ -111,26 +116,26 @@ if __name__ == '__main__':
 
     se = SearchEngine()
 
-    """se.list_docs([455, # R
-                                590, # R
-                                2183, # N
-                                3403, # N
-                                3738, # N
-                                4263, # N
-                                4802, # N
-                                4959, # N
-                                5988, # N
-                                6219, # N
-                                6332, # N
-                                6623, # N
-                                6920, # N
-                                7112, # N
-                                7126, # N
-                                7241, # N
-                                8285, # N
-                                8467, # N
-                                9104, # N
-                                9605, # N
-                                9625, # N
-                                9641]) # N"""
+    se.list_docs(
+                    [1067,
+                      2108,
+                      2677,
+                      3083,
+                      4098,
+                      4263,
+                      6206,
+                      6802,
+                      7126,
+                      7187,
+                      7569,
+                      8153,
+                      8351,
+                      8361,
+                      8413,
+                      8637,
+                      9617,
+                      9718,
+                      10593,
+                      10915,
+                      10929]        )
 
