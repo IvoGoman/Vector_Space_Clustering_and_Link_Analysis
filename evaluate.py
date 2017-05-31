@@ -20,8 +20,11 @@ QUERIES = [k for k in RELEVANT_DOCIDS.keys()]
 P_AT_N = 10
 MODEL_ALPHAS = [
     0.0,
+    0.2,
     1/3,
+    0.5,
     2/3,
+    0.8,
     1
 ]
 
@@ -57,9 +60,12 @@ def compute_rprecision(relevant: set, retrieved: list):
 
 def average_precision(relevant: set, retrieved: list):
     _sum_precisions = 0
-    for rel in relevant:
+    for rel in relevant.intersection(set(retrieved)):
         _sum_precisions += compute_p_at_k(retrieved.index(rel), relevant, retrieved)
     return _sum_precisions/len(relevant)
+
+def mean_average_precision(average_precisions:list):
+    return sum(average_precisions)/len(average_precisions)
 
 
 def pooling(query: dict):
@@ -83,16 +89,17 @@ def obtain_ranked_array(ranking_query: dict) -> dict:
     return ranked_dict_per_query
 
 
-def plot_rprecision(y:list, legend: list):
+def plot(y:list, legend: list, xlabel, ylabel, filename):
     X = np.array(MODEL_ALPHAS)
     graphs = []
     for g in range(len(y)):
         graphs.append(plt.plot(X, np.array(y[g]), label=legend[g])[0])
     plt.legend(handles=graphs)
 
-    plt.xlabel('alpha value')
-    plt.ylabel('r-precision')
-    plt.savefig("r-precision.png")
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.savefig(filename)
+    plt.gcf().clear()
 
 
 if __name__ == '__main__':
@@ -105,7 +112,8 @@ if __name__ == '__main__':
         evaluation[query]= {}
         for alpha, ranking in alphas.items():
             evaluation[query][alpha] = {
-                'r-precision': compute_rprecision(RELEVANT_DOCIDS[query], ranking)
+                'r-precision': compute_rprecision(RELEVANT_DOCIDS[query], ranking),
+                'average_precision': average_precision(RELEVANT_DOCIDS[query], ranking)
             }
     print('Document ids considered relevant by query')
     pprint(union_of_retrieved_docs)
@@ -115,5 +123,12 @@ if __name__ == '__main__':
     r_precision = []
     for q in legend:
         r_precision.append([evaluation[q][a]['r-precision'] for a in MODEL_ALPHAS])
-    plot_rprecision(r_precision, legend)
+    plot(r_precision, legend, xlabel='alpha value', ylabel='r-precision', filename='r-precision.png')
+
+    legend = ['Mean Average Precision']
+    average_precisions = []
+    for alpha in MODEL_ALPHAS:
+        average_precisions.append([evaluation[q][alpha]['average_precision'] for q in QUERIES])
+    mean_average_precisions = [[mean_average_precision(ap) for ap in average_precisions]]
+    plot(mean_average_precisions, legend, xlabel='alpha value', ylabel=legend[0], filename='mean_average_precision.png')
 
