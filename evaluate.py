@@ -11,9 +11,9 @@ QUERIES = [
 ]
 
 RELEVANT_DOCIDS = {
-    "satellite launch": set(),
-    "national rifle association": set(),
-    "diabetes risk": set()
+    "satellite launch": set([0]),
+    "national rifle association": set([0]),
+    "diabetes risk": set([0])
 }
 
 P_AT_N = 10
@@ -88,9 +88,9 @@ if __name__ == '__main__':
     for query, alphas in ranked_array_by_query.items():
         union_of_retrieved_docs[query] = pooling(alphas)
         evaluation[query]= {}
-        for ranking in alphas.values():
-            evaluation[query][alphas] = {
-                'r-precision' : compute_rprecision(RELEVANT_DOCIDS[query], ranking)
+        for alpha, ranking in alphas.items():
+            evaluation[query][alpha] = {
+                'r-precision': compute_rprecision(RELEVANT_DOCIDS[query], ranking)
             }
     print('Document ids considered relevant by query')
     pprint(union_of_retrieved_docs)
