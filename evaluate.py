@@ -1,20 +1,21 @@
 from search_modules import Query
 from search_engine import SearchEngine
 from pprint import pprint
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 SEARCH_ENGINE = SearchEngine()
 
-QUERIES = [
-    "satellite launch",
-    "national rifle association",
-    "diabetes risk"
-]
-
 RELEVANT_DOCIDS = {
-    "satellite launch": set([]),
     "national rifle association": set([455, 590]),
-    "diabetes risk": set([454, 3059, 3258, 7425])
+    "diabetes risk": set([3059, 3258, 7425]),
+    "NASA Apollo": set([9350,10658,7208,4649,6490]),
+    "sound driver" : set([3167,9563,10812,8094,5767,9754,10116,2946]),
+    "color printer" : set([4236,10473])
 }
+
+QUERIES = [k for k in RELEVANT_DOCIDS.keys()]
 
 P_AT_N = 10
 MODEL_ALPHAS = [
@@ -82,6 +83,18 @@ def obtain_ranked_array(ranking_query: dict) -> dict:
     return ranked_dict_per_query
 
 
+def plot_rprecision(y:list, legend: list):
+    X = np.array(MODEL_ALPHAS)
+    graphs = []
+    for g in range(len(y)):
+        graphs.append(plt.plot(X, np.array(y[g]), label=legend[g])[0])
+    plt.legend(handles=graphs)
+
+    plt.xlabel('alpha value')
+    plt.ylabel('r-precision')
+    plt.savefig("r-precision.png")
+
+
 if __name__ == '__main__':
     ranking_query = run_queries(QUERIES, MODEL_ALPHAS, P_AT_N)
     ranked_array_by_query = obtain_ranked_array(ranking_query)
@@ -97,3 +110,10 @@ if __name__ == '__main__':
     print('Document ids considered relevant by query')
     pprint(union_of_retrieved_docs)
     pprint(evaluation)
+
+    legend = QUERIES
+    r_precision = []
+    for q in legend:
+        r_precision.append([evaluation[q][a]['r-precision'] for a in MODEL_ALPHAS])
+    plot_rprecision(r_precision, legend)
+
