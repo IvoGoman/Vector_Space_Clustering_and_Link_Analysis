@@ -29,6 +29,10 @@ class SearchEngine:
 
         self.newsgroup_frame = pd.DataFrame.from_dict({'text': self.newsgroup_data.data})
 
+        #f = self.newsgroup_frame.text.str.contains('National Rifle Association')
+
+        #ids = np.arange(len(self.newsgroup_frame))[f]
+        #self.list_docs(ids)
         #return
 
         self.tfidf_matrix = TfIdfMatrix.from_data_set(self.newsgroup_data.data)
@@ -82,14 +86,14 @@ class SearchEngine:
         pr_rel_n = normalize(pr_rel,norm='max',axis=1)
         cos_rel_n = normalize(cos_rel,norm='max',axis=1)
 
-        doc_rel = self.newsgroup_frame.iloc[docs]
+        doc_rel = self.newsgroup_frame.iloc[docs].copy()
 
         doc_rel['pr_score'] = pr_rel_n.T
         doc_rel['cos_score'] = cos_rel_n.T
         doc_rel['score'] = doc_rel.pr_score * alpha_pr + doc_rel.cos_score * (1 - alpha_pr)
 
         doc_rel = doc_rel.sort_values(by='score',axis=0, ascending=False)
-        print(doc_rel)
+        # print(doc_rel)
         return doc_rel
 
     def p_at_r(self, q: Query, rel_ids: IntList, alpha_pr: float=0.2):
