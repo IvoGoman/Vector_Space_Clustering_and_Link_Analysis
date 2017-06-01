@@ -8,11 +8,11 @@ import numpy as np
 SEARCH_ENGINE = SearchEngine()
 
 RELEVANT_DOCIDS = {
-    "national rifle association": set([455, 590]),
-    "diabetes risk": set([3059, 3258, 7425]),
-    "NASA Apollo": set([9350,10658,7208,4649,6490]),
+    "national rifle association": set([455, 590, 4802, 4959, 8285, 10774]),
+    "diabetes risk": set([3059, 3258, 7425, 454]),
+    "NASA Apollo": set([9350,10658,7208,4649,6490,6856,7208]),
     "sound driver" : set([3167,9563,10812,8094,5767,9754,10116,2946]),
-    "color printer" : set([4236,10473])
+    "color printer" : set([4236,10473, 1146])
 }
 
 QUERIES = [k for k in RELEVANT_DOCIDS.keys()]
