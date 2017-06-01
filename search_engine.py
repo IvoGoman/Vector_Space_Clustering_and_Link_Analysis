@@ -40,7 +40,7 @@ class SearchEngine:
         self.inverted_index = InvertedIndex.from_tf_idf_matrix(self.tfidf_matrix)
 
         util.log("Clustering...")
-        self.kmeans = KMeans(tfidf=self.tfidf_matrix.get_matrix(), k=20, max_iterations=20, random_initial=False)
+        self.kmeans = KMeans(tfidf=self.tfidf_matrix.get_matrix(), k=100, max_iterations=30, random_initial=False)
 
         try:
             self.kmeans.load_cluster_vector('cluster_vector.pkl')

@@ -20,6 +20,7 @@ class KMeans:
         self.k = k
         self.i = max_iterations
         self.clusters = []
+        self.doc_cluster = [None for i in range(self._tfidf.shape[0])]
         self.converge = None
         if random_initial:
             self.__initialize_clusters_with_random_centroids()
@@ -54,32 +55,26 @@ class KMeans:
         centroids = np.random.rand(self.k, self._tfidf.shape[1])
         [self.clusters.append(Cluster(initial_centroid=centroid)) for centroid in centroids]
 
-    def __cluster(self):
+    def __cluster1(self):
         self.converge = True
         centroids = bmat([[item for item in c.centroid[0]] for c in self.clusters])
         similarities = centroids.dot(self._tfidf.T)
-        for d in range(similarities.shape[1]):
-            best_sim = 0
-            best_cluster = None
-            current_cluster = None
-            for c in range(similarities.shape[0]):
-                sim = similarities[c,d]
-                if d in self.clusters[c].members:
-                    current_cluster = c
-                if sim > best_sim:
-                    best_sim = sim
-                    best_cluster = c
-            if current_cluster != best_cluster:
-                self.clusters[best_cluster].members.add(d)
-                if current_cluster:
-                    self.clusters[current_cluster].members.remove(d)
+        max_vals = np.argmax(similarities, axis=0)
+        for doc_idx in range(max_vals.shape[1]):
+            best_cluster_idx = max_vals[0, doc_idx]
+            if self.doc_cluster[doc_idx] != best_cluster_idx:
+                if self.doc_cluster[doc_idx] is not None:
+                    old_cluster = self.doc_cluster[doc_idx]
+                    self.clusters[old_cluster].members.remove(doc_idx)
+                self.doc_cluster[doc_idx] = best_cluster_idx
+                self.clusters[best_cluster_idx].members.add(doc_idx)
                 self.converge = False
 
     def do_magic(self):
         for i in range(self.i):
             util.log('kmeans iteration %s starting' % str(i))
             self._recalc_centroids()
-            self.__cluster()
+            self.__cluster1()
             if self.converge:
                 break
 
