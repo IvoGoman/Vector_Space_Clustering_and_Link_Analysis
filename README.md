@@ -12,7 +12,7 @@ Project for the Course "Information Retrieval and Web Search" during the Spring 
     - npm 3.x.x
 - Search Component:
     - pip3 install -r requirements.txt
-    - python3 query_service.py
+    - python3 search-engine/query_service.py
 - Search UI:
     - cd search-app/
     - npm install
