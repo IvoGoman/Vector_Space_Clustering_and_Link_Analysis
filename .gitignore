@@ -169,6 +169,7 @@ libpeerconnection.log
 npm-debug.log
 /tmp/
 /scripts/bower/bower-*
+*.png
 .vscode
 *.log
 *.stackdump
