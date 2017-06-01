@@ -40,7 +40,7 @@ class KMeans:
         else:
             return self.__vector
 
-    def _recalc_centroids(self):
+    def __recalc_centroids(self):
         for cluster in self.clusters:
             if len(cluster.members) != 0:
                 mem = np.array([self._tfidf[m] for m in cluster.members])
@@ -55,7 +55,7 @@ class KMeans:
         centroids = np.random.rand(self.k, self._tfidf.shape[1])
         [self.clusters.append(Cluster(initial_centroid=centroid)) for centroid in centroids]
 
-    def __cluster1(self):
+    def __cluster(self):
         self.converge = True
         centroids = bmat([[item for item in c.centroid[0]] for c in self.clusters])
         similarities = centroids.dot(self._tfidf.T)
@@ -73,8 +73,8 @@ class KMeans:
     def do_magic(self):
         for i in range(self.i):
             util.log('kmeans iteration %s starting' % str(i))
-            self._recalc_centroids()
-            self.__cluster1()
+            self.__recalc_centroids()
+            self.__cluster()
             if self.converge:
                 break
 
@@ -84,16 +84,3 @@ class KMeans:
 
     def load_cluster_vector(self, file):
         self.__vector = pkl.load(open(file, "rb"))
-
-
-
-def cosine_sim(a: csr_matrix, b: csr_matrix):
-    """
-    :param a, b: Vector of size 1:#terms
-    :return: Cosine distance
-    """
-    _len_a = np.sqrt((a.power(2)).sum())
-    _len_b = np.sqrt((b.power(2)).sum())
-    scalar = float((a.multiply(b)).sum())
-    return scalar / (_len_a * _len_b)
-
