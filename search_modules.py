@@ -228,7 +228,10 @@ class AdjacencyMatrix:
         2. contains ONLY links between the most similar values of documents in different clusters
         :return:
         """
-        slices = np.insert(self._cluster_sizes, 0, 0)
+        if 0 not in self._cluster_sizes.tolist():
+            slices = np.insert(self._cluster_sizes, 0, 0)
+        else:
+            slices = self._cluster_sizes
         # slices is the count of all cluster's sizes, with a 0 at the start
         sizes_sum = np.cumsum(slices)
         # contains the "boundaries" index-wise, starting with 0, size_cluster1, size_cluster1 + size_cluster_2 , ...
